@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { createServiceClient } from '@/lib/supabase';
+import sharp from 'sharp';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+// Accept any image type — sharp will normalize to JPEG
+const ALLOWED_TYPES_PREFIX = 'image/';
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB before conversion (HEIC can be large)
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -27,7 +29,7 @@ export async function POST(req: NextRequest) {
   const uploadedPaths: string[] = [];
 
   for (const file of files) {
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!file.type.startsWith(ALLOWED_TYPES_PREFIX)) {
       return NextResponse.json(
         { error: `Invalid file type: ${file.type}` },
         { status: 400 }
@@ -36,29 +38,28 @@ export async function POST(req: NextRequest) {
 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: `File ${file.name} exceeds 5MB limit` },
+        { error: `File ${file.name} exceeds 10MB limit` },
         { status: 400 }
       );
     }
 
-    const mimeToExt: Record<string, string> = {
-      'image/jpeg': 'jpg',
-      'image/jpg': 'jpg',
-      'image/png': 'png',
-      'image/webp': 'webp',
-    };
-    const ext = mimeToExt[file.type] ?? 'jpg';
+    const bytes = await file.arrayBuffer();
+    const inputBuffer = Buffer.from(bytes);
+
+    // Convert everything to JPEG — handles HEIC, HEIF, PNG, WEBP, etc.
+    const jpegBuffer = await sharp(inputBuffer)
+      .rotate() // auto-rotate based on EXIF orientation
+      .jpeg({ quality: 88 })
+      .toBuffer();
+
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8);
-    const storagePath = `listings/${timestamp}-${random}.${ext}`;
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const storagePath = `listings/${timestamp}-${random}.jpg`;
 
     const { error } = await db.storage
       .from('listing-images')
-      .upload(storagePath, buffer, {
-        contentType: file.type,
+      .upload(storagePath, jpegBuffer, {
+        contentType: 'image/jpeg',
         upsert: false,
       });
 
