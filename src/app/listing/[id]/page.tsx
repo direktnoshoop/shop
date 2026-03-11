@@ -12,6 +12,7 @@ import StickyContactBar from '@/components/StickyContactBar';
 import SoldBadge from '@/components/SoldBadge';
 import PublicHeader from '@/components/PublicHeader';
 import SizeGuideButton from '@/components/SizeGuideButton';
+import RelatedListings from '@/components/RelatedListings';
 import { SizeGuide } from '@/types';
 
 export const metadata: Metadata = {
@@ -56,6 +57,39 @@ export default async function ListingDetailPage({ params }: Props) {
   const listingMessage: string = settingsData?.value ?? '';
   const currency = listing.currency || CURRENCY;
   const images = listing.listing_images ?? [];
+
+  // Fetch related listings: same category first, then fill with others
+  const RELATED_COUNT = 5;
+  let relatedListings: Listing[] = [];
+
+  if (listing.category) {
+    const { data: sameCategory } = await supabase
+      .from('listings')
+      .select('*, listing_images(id, storage_path, display_order)')
+      .eq('is_hidden', false)
+      .eq('is_sold', false)
+      .eq('category', listing.category)
+      .neq('id', listing.id)
+      .order('created_at', { ascending: false })
+      .limit(RELATED_COUNT);
+
+    relatedListings = sameCategory ?? [];
+  }
+
+  if (relatedListings.length < RELATED_COUNT) {
+    const needed = RELATED_COUNT - relatedListings.length;
+    const excludeIds = [listing.id, ...relatedListings.map((l) => l.id)];
+    const { data: others } = await supabase
+      .from('listings')
+      .select('*, listing_images(id, storage_path, display_order)')
+      .eq('is_hidden', false)
+      .eq('is_sold', false)
+      .not('id', 'in', `(${excludeIds.join(',')})`)
+      .order('created_at', { ascending: false })
+      .limit(needed);
+
+    relatedListings = [...relatedListings, ...(others ?? [])];
+  }
 
   const conditionColors: Record<string, string> = {
     'Novo sa etiketom': 'bg-green-100 text-green-800',
@@ -192,6 +226,8 @@ export default async function ListingDetailPage({ params }: Props) {
             )}
           </div>
         </div>
+
+        <RelatedListings listings={relatedListings} category={listing.category} />
 
         <div className="mt-8">
           <Link
