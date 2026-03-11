@@ -1,12 +1,11 @@
 import { Suspense } from "react";
-import Link from "next/link";
-
 export const dynamic = "force-dynamic";
 import { supabase } from "@/lib/supabase";
 import { Listing } from "@/types";
 import { toRSD } from "@/lib/config";
 import HomepageContent from "@/components/HomepageContent";
 import PublicHeader from "@/components/PublicHeader";
+import InfoBanner from "@/components/InfoBanner";
 
 export default async function HomePage() {
   const [listingsResult, brandsResult, categoriesResult, colorsResult, sizesResult] =
@@ -61,19 +60,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-gray-50">
       <PublicHeader />
 
-      <div className="bg-rose-50 border-b border-rose-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-3 text-sm">
-          <span className="text-rose-700">
-            Prvi put kupujes? Saznaj kako funkcionise kupovina.
-          </span>
-          <Link
-            href="/kako-kupiti"
-            className="inline-flex items-center gap-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
-          >
-            Kako naručiti →
-          </Link>
-        </div>
-      </div>
+      <InfoBanner />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <Suspense fallback={<HomepageSkeleton />}>
