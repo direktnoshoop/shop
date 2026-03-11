@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { revalidatePath } from 'next/cache';
 import { authOptions } from '@/lib/auth';
 import { createServiceClient, supabase } from '@/lib/supabase';
 
@@ -102,5 +103,6 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  revalidatePath('/');
   return NextResponse.json(listing, { status: 201 });
 }

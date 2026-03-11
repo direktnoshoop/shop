@@ -7,7 +7,12 @@ export function getSupabaseClient(): SupabaseClient {
   if (!_supabase) {
     _supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          fetch: (url, opts) => fetch(url, { ...opts, cache: 'no-store' }),
+        },
+      }
     );
   }
   return _supabase;
@@ -22,11 +27,17 @@ export const supabase = {
 };
 
 // Server-only client — uses service role key, bypasses RLS
+// fetch: cache: 'no-store' ensures Next.js never serves stale data from its fetch cache
 export function createServiceClient(): SupabaseClient {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
+    {
+      auth: { persistSession: false },
+      global: {
+        fetch: (url, opts) => fetch(url, { ...opts, cache: 'no-store' }),
+      },
+    }
   );
 }
 

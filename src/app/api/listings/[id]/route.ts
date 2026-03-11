@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { revalidatePath } from 'next/cache';
 import { authOptions } from '@/lib/auth';
 import { createServiceClient, supabase } from '@/lib/supabase';
 
@@ -87,6 +88,8 @@ export async function PATCH(
     await db.from('listing_images').insert(imageRows);
   }
 
+  revalidatePath('/');
+  revalidatePath(`/listing/${params.id}`);
   return NextResponse.json(data);
 }
 
@@ -119,5 +122,7 @@ export async function DELETE(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  revalidatePath('/');
+  revalidatePath(`/listing/${params.id}`);
   return NextResponse.json({ success: true });
 }
