@@ -87,7 +87,12 @@ export default async function ListingDetailPage({ params }: Props) {
               <p className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-1">
                 {listing.brand}
                 {listing.category && (
-                  <span className="ml-2 normal-case tracking-normal text-gray-300">· {listing.category}</span>
+                  <Link
+                    href={`/?category=${encodeURIComponent(listing.category)}`}
+                    className="ml-2 normal-case tracking-normal text-gray-300 hover:text-rose-400 transition-colors"
+                  >
+                    · {listing.category}
+                  </Link>
                 )}
                 {listing.color && (
                   <span className="ml-2 normal-case tracking-normal text-gray-300">· {listing.color}</span>
@@ -112,22 +117,26 @@ export default async function ListingDetailPage({ params }: Props) {
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {listing.size.map((s) => (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap gap-2">
+                {listing.size.map((s) => (
+                  <span
+                    key={s}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-700 font-medium"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+              <div>
                 <span
-                  key={s}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-700 font-medium"
+                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${
+                    conditionColors[listing.condition] ?? 'bg-gray-100 text-gray-700'
+                  }`}
                 >
-                  {s}
+                  {listing.condition}
                 </span>
-              ))}
-              <span
-                className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium ${
-                  conditionColors[listing.condition] ?? 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                {listing.condition}
-              </span>
+              </div>
             </div>
 
             {listing.is_sold && (
