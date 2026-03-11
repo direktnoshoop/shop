@@ -57,6 +57,23 @@ export default function ListingCard({ listing }: Props) {
             {listing.price.toLocaleString('sr-RS')} {currency}
           </span>
         </div>
+        {listing.size && listing.size.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {listing.size.slice(0, 4).map((s) => (
+              <span
+                key={s}
+                className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full"
+              >
+                {s}
+              </span>
+            ))}
+            {listing.size.length > 4 && (
+              <span className="text-[10px] font-medium text-gray-400 px-1 py-0.5">
+                +{listing.size.length - 4}
+              </span>
+            )}
+          </div>
+        )}
         <p className="text-xs text-gray-400 mt-1 truncate">{listing.condition}</p>
       </div>
     </Link>
