@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import imageCompression from 'browser-image-compression';
 import { Listing, CONDITIONS, Brand, Category, Color, SizeGuide } from '@/types';
 import ImageUploader, { PendingImage, UnifiedImage } from './ImageUploader';
 import RichTextEditor from './RichTextEditor';
@@ -84,7 +85,15 @@ export default function ListingForm({ listing, brands, categories, colors, sizeG
       let newImagePaths: string[] = [];
       if (orderedPending.length > 0) {
         const formData = new FormData();
-        orderedPending.forEach((item) => formData.append('files', item.data.file));
+        for (const item of orderedPending) {
+          const compressed = await imageCompression(item.data.file, {
+            maxSizeMB: 3,
+            maxWidthOrHeight: 1600,
+            useWebWorker: true,
+            fileType: 'image/jpeg',
+          });
+          formData.append('files', compressed, compressed.name.replace(/\.[^.]+$/, '.jpg'));
+        }
 
         const uploadRes = await fetch('/api/upload', {
           method: 'POST',
