@@ -227,7 +227,7 @@ export default async function ListingDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <RelatedListings listings={relatedListings} category={listing.category} />
+        <RelatedListings listings={relatedListings} category={listing.category ?? undefined} />
 
         <div className="mt-8">
           <Link
