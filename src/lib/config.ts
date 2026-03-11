@@ -12,7 +12,7 @@ export function toRSD(price: number, currency: string): number {
   return currency === 'EUR' ? price * EUR_TO_RSD : price;
 }
 
-export const SITE_NAME = 'DFShop';
+export const SITE_NAME = 'DiFShop';
 
 export function buildWhatsAppUrl(listingTitle: string): string {
   const number = CONTACT.whatsapp.replace(/\D/g, '');
