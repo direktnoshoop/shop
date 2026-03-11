@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 import { supabase } from "@/lib/supabase";
@@ -59,6 +60,20 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <PublicHeader />
+
+      <div className="bg-rose-50 border-b border-rose-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-3 text-sm">
+          <span className="text-rose-700">
+            Prvi put kupujes? Saznaj kako funkcionise kupovina.
+          </span>
+          <Link
+            href="/kako-kupiti"
+            className="inline-flex items-center gap-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
+          >
+            Kako naručiti →
+          </Link>
+        </div>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <Suspense fallback={<HomepageSkeleton />}>
