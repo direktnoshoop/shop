@@ -41,7 +41,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const ext = file.name.split('.').pop() ?? 'jpg';
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+    };
+    const ext = mimeToExt[file.type] ?? 'jpg';
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 8);
     const storagePath = `listings/${timestamp}-${random}.${ext}`;
