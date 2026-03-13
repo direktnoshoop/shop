@@ -94,10 +94,13 @@ export default function KakoKupitiPage() {
                   Dogovorite detalje
                 </h2>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  Kupovina se dogovara direktno sa prodavcem - bez onlajn
-                  plaćanja i bez korpe. Sve se rešava privatno: cena je fiksna i
-                  navedena na oglasu, a preuzimanje ili dostava se dogovaraju u
-                  razgovoru.
+                  Kupovina je jednostavna i bezbedna. Cena je fiksna i navedena
+                  na svakom oglasu, a plaćanje i preuzimanje se dogovaraju
+                  direktno sa prodavcem putem poruke. Dostava se vrši isključivo
+                  putem kurirskih službi - lično preuzimanje nije u opciji.
+                  Detalji oko slanja (kurirska služba, troškovi dostave,
+                  pakovanje) se dogovaraju u razgovoru pre nego što se pošiljka
+                  pošalje.
                 </p>
               </div>
             </div>
