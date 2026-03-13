@@ -84,7 +84,6 @@ export default function ListingForm({ listing, brands, categories, colors, sizeG
 
       let newImagePaths: string[] = [];
       if (orderedPending.length > 0) {
-        const formData = new FormData();
         for (const item of orderedPending) {
           const compressed = await imageCompression(item.data.file, {
             maxSizeMB: 3,
@@ -92,21 +91,28 @@ export default function ListingForm({ listing, brands, categories, colors, sizeG
             useWebWorker: true,
             fileType: 'image/jpeg',
           });
+
+          const formData = new FormData();
           formData.append('files', compressed, compressed.name.replace(/\.[^.]+$/, '.jpg'));
+
+          const uploadRes = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!uploadRes.ok) {
+            let errorMessage = 'Greška pri uploadu slika.';
+            const contentType = uploadRes.headers.get('content-type') ?? '';
+            if (contentType.includes('application/json')) {
+              const data = await uploadRes.json();
+              errorMessage = data.error ?? errorMessage;
+            }
+            throw new Error(errorMessage);
+          }
+
+          const uploadData = await uploadRes.json();
+          newImagePaths.push(...uploadData.paths);
         }
-
-        const uploadRes = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!uploadRes.ok) {
-          const data = await uploadRes.json();
-          throw new Error(data.error ?? 'Greška pri uploadu slika.');
-        }
-
-        const uploadData = await uploadRes.json();
-        newImagePaths = uploadData.paths; // same length & order as orderedPending
       }
 
       // 3. Build display_order assignments
