@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import imageCompression from 'browser-image-compression';
-import { Listing, CONDITIONS, Brand, Category, Color, SizeGuide } from '@/types';
+import { Listing, CONDITIONS, PROMOTIONS, Promotion, Brand, Category, Color, SizeGuide } from '@/types';
 import ImageUploader, { PendingImage, UnifiedImage } from './ImageUploader';
 import RichTextEditor from './RichTextEditor';
 
@@ -31,6 +31,7 @@ export default function ListingForm({ listing, brands, categories, colors, sizeG
   const [condition, setCondition] = useState(listing?.condition ?? '');
   const [description, setDescription] = useState(listing?.description ?? '');
   const [sizeGuideId, setSizeGuideId] = useState(listing?.size_guide_id ?? '');
+  const [promotion, setPromotion] = useState<Promotion | ''>(listing?.promotion ?? '');
 
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
@@ -139,6 +140,7 @@ export default function ListingForm({ listing, brands, categories, colors, sizeG
         condition,
         description: description.trim() || null,
         size_guide_id: sizeGuideId || null,
+        promotion: promotion || null,
         image_paths: newImagePaths,
         new_image_orders,
         ...(isEditing && {
@@ -428,6 +430,49 @@ export default function ListingForm({ listing, brands, categories, colors, sizeG
         {!condition && (
           <p className="text-xs text-gray-400 mt-1.5">Odaberi stanje artikla</p>
         )}
+      </div>
+
+      {/* Promotion */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          Promocija
+          <span className="ml-2 text-xs font-normal text-gray-400">(opciono — prikazuje se kao traka na slici)</span>
+        </label>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setPromotion('')}
+            className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+              promotion === ''
+                ? 'bg-gray-800 border-gray-800 text-white'
+                : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'
+            }`}
+          >
+            Bez promocije
+          </button>
+          {PROMOTIONS.map((p) => {
+            const isSelected = promotion === p.value;
+            const colorClass =
+              p.value === 'novo' ? 'bg-emerald-500 border-emerald-500' :
+              p.value === 'poslednja_velicina' ? 'bg-rose-500 border-rose-500' :
+              'bg-amber-400 border-amber-400';
+            const textClass = p.value === 'akcija' ? 'text-gray-900' : 'text-white';
+            return (
+              <button
+                key={p.value}
+                type="button"
+                onClick={() => setPromotion(p.value)}
+                className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                  isSelected
+                    ? `${colorClass} ${textClass}`
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'
+                }`}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Description */}

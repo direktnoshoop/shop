@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Listing } from '@/types';
 import { getPublicImageUrl } from '@/lib/supabase';
 import SoldBadge from './SoldBadge';
+import PromotionRibbon from './PromotionRibbon';
 import { CURRENCY } from '@/lib/config';
 
 interface Props {
@@ -37,6 +38,9 @@ export default function ListingCard({ listing }: Props) {
           </div>
         )}
         {listing.is_sold && <SoldBadge />}
+        {listing.promotion && !listing.is_sold && (
+          <PromotionRibbon promotion={listing.promotion} />
+        )}
         {/* Category badge overlaid on image */}
         {listing.category && !listing.is_sold && (
           <span className="absolute top-2 left-2 bg-black/50 text-white text-[10px] font-medium px-2 py-0.5 rounded-full backdrop-blur-sm">

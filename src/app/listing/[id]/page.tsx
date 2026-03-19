@@ -13,6 +13,7 @@ import SoldBadge from '@/components/SoldBadge';
 import PublicHeader from '@/components/PublicHeader';
 import SizeGuideButton from '@/components/SizeGuideButton';
 import RelatedListings from '@/components/RelatedListings';
+import PromotionRibbon from '@/components/PromotionRibbon';
 import { SizeGuide } from '@/types';
 
 export const metadata: Metadata = {
@@ -111,6 +112,11 @@ export default async function ListingDetailPage({ params }: Props) {
             {listing.is_sold && (
               <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                 <SoldBadge />
+              </div>
+            )}
+            {listing.promotion && !listing.is_sold && (
+              <div className="absolute top-0 right-0 overflow-hidden rounded-tr-2xl pointer-events-none">
+                <PromotionRibbon promotion={listing.promotion} />
               </div>
             )}
           </div>
