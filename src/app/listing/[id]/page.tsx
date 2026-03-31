@@ -16,9 +16,26 @@ import RelatedListings from '@/components/RelatedListings';
 import PromotionRibbon from '@/components/PromotionRibbon';
 import { SizeGuide } from '@/types';
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-};
+const SITE_URL = 'https://direktnoizfabrike.vercel.app';
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { data } = await supabase
+    .from('listings')
+    .select('title, brand')
+    .eq('id', params.id)
+    .single();
+
+  const title = data ? `${data.title} — ${data.brand}` : 'DiFShop';
+
+  return {
+    title,
+    robots: { index: false, follow: false },
+    openGraph: {
+      title,
+      images: [{ url: `${SITE_URL}/logo.png`, width: 512, height: 512 }],
+    },
+  };
+}
 
 interface Props {
   params: { id: string };
